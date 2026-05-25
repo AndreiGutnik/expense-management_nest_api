@@ -1,16 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
+import { CreateUserDto } from '@/user/dto/create-user.dto'
+// import { UpdateUserDto } from '@/user/dto/update-user.dto'
 import { InjectRepository } from '@nestjs/typeorm'
-import { User } from './entities/user.entity'
+import { User } from '@/user/entities/user.entity'
 import { Repository } from 'typeorm'
 import * as argon2 from 'argon2'
 import { plainToInstance } from 'class-transformer'
+import { JwtService } from '@nestjs/jwt'
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -26,7 +28,10 @@ export class UserService {
       email: createUserDto.email,
       password: await argon2.hash(createUserDto.password),
     })
-    return plainToInstance(User, user)
+
+    const access_token = this.jwtService.sign({ email: createUserDto.email })
+
+    return plainToInstance(User, { ...user, access_token })
   }
 
   async findAll() {
@@ -41,11 +46,11 @@ export class UserService {
     })
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`
-  }
+  // update(id: number, updateUserDto: UpdateUserDto) {
+  //   return `This action updates a #${id} user`
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} user`
+  // }
 }
