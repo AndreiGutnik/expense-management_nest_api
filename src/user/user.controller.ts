@@ -8,9 +8,11 @@ import {
   Delete,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user.dto'
+import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard'
 // import { UpdateUserDto } from './dto/update-user.dto'
 
 @Controller('user')
@@ -24,6 +26,7 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   findAll() {
     return this.userService.findAll()
   }
