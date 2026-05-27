@@ -29,5 +29,5 @@
     }
   },
 
-  "include": ["src/**/*", "src/types/express.d.ts"]
+  "include": ["src/**/*", "src/user/types/express.d.ts"]
 }
