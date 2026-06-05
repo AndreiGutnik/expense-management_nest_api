@@ -3,13 +3,16 @@
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
+
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+
     "allowSyntheticDefaultImports": true,
+
     "target": "ES2021",
     "sourceMap": true,
 
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "./dist",
 
     "incremental": true,
@@ -18,7 +21,6 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "noUnusedLocals": false,
@@ -29,5 +31,5 @@
     }
   },
 
-  "include": ["src/**/*", "src/user/types/express.d.ts"]
+  "include": ["src/**/*", "apps/**/*"]
 }

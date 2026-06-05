@@ -3,12 +3,14 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 import { Category } from '@/modules/category/entities/category.entity'
 import { Transaction } from '@/modules/transaction/entities/transaction.entity'
 import { Exclude } from 'class-transformer'
+import { Token } from '@/modules/token/entities/token.entity'
 
 @Entity()
 export class User {
@@ -22,6 +24,13 @@ export class User {
   @Column()
   password: string
 
+  @Column({ default: false })
+  verify: boolean
+
+  @Exclude()
+  @Column({ nullable: true })
+  verificationLink: string
+
   @OneToMany(() => Category, category => category.user, { onDelete: 'CASCADE' })
   categories: Category[]
 
@@ -29,6 +38,9 @@ export class User {
     onDelete: 'CASCADE',
   })
   transactions: Transaction[]
+
+  @OneToOne(() => Token, token => token.user, { onDelete: 'CASCADE' })
+  refreshToken: Token
 
   @CreateDateColumn()
   createdAt: Date

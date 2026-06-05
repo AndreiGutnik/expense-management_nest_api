@@ -15,7 +15,7 @@ import {
 import { TransactionService } from '@/modules/transaction/transaction.service'
 import { CreateTransactionDto } from '@/modules/transaction/dto/create-transaction.dto'
 import { UpdateTransactionDto } from '@/modules/transaction/dto/update-transaction.dto'
-import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
+import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard'
 import { OwnershipGuard } from '@/core/authorization/guards/ownership.guard'
 import { CheckOwnership } from '@/core/authorization/decorators/check-ownership.decorator'
 import { Transaction } from '@/modules/transaction/entities/transaction.entity'
@@ -31,25 +31,25 @@ export class TransactionController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessGuard)
   create(@Body() createTransactionDto: CreateTransactionDto, @Req() req) {
     return this.transactionService.create(createTransactionDto, +req.user.id)
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessGuard)
   findAll(@Req() req) {
     return this.transactionService.findAll(+req.user.id)
   }
 
   @Get(':type/find')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessGuard)
   findAllByType(@Req() req, @Param('type') type: string) {
     return this.transactionService.findAllByType(+req.user.id, type)
   }
 
   @Get('pagination')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAccessGuard)
   findAllWithPagination(
     @Req() req,
     @Query('page') page: number,
@@ -63,13 +63,13 @@ export class TransactionController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, OwnershipGuard)
+  @UseGuards(JwtAccessGuard, OwnershipGuard)
   findOne(@Param('id') id: string) {
     return this.transactionService.findOne(+id)
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, OwnershipGuard)
+  @UseGuards(JwtAccessGuard, OwnershipGuard)
   update(
     @Param('id') id: string,
     @Body() updateTransactionDto: UpdateTransactionDto,
@@ -78,7 +78,7 @@ export class TransactionController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, OwnershipGuard)
+  @UseGuards(JwtAccessGuard, OwnershipGuard)
   remove(@Param('id') id: string) {
     return this.transactionService.remove(+id)
   }
