@@ -64,9 +64,22 @@ export class UserService {
   }
 
   async findOneByEmail(email: string) {
-    return await this.userRepository.findOne({
+    return this.userRepository.findOne({
       where: {
         email,
+      },
+      relations: {
+        role: {
+          permissions: true,
+        },
+      },
+      order: {
+        role: {
+          permissions: {
+            resource: 'ASC',
+            action: 'ASC',
+          },
+        },
       },
     })
   }

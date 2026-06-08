@@ -53,6 +53,12 @@ export class RoleService {
       relations: {
         permissions: true,
       },
+      order: {
+        permissions: {
+          resource: 'ASC',
+          action: 'ASC',
+        },
+      },
     })
     if (!role) {
       throw new BadRequestException('Role not found')
@@ -65,6 +71,12 @@ export class RoleService {
       where: { id },
       relations: {
         permissions: true,
+      },
+      order: {
+        permissions: {
+          resource: 'ASC',
+          action: 'ASC',
+        },
       },
     })
 
@@ -122,6 +134,12 @@ export class RoleService {
       where: { id },
       relations: {
         permissions: true,
+      },
+      order: {
+        permissions: {
+          resource: 'ASC',
+          action: 'ASC',
+        },
       },
     })
 
