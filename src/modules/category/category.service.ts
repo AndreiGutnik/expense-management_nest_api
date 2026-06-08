@@ -86,8 +86,6 @@ export class CategoryService {
   async remove(id: number) {
     const category = await this.findCategoryById(id)
 
-    await this.categoryRepository.remove(category)
-
-    return category
+    return await this.categoryRepository.remove(category)
   }
 }

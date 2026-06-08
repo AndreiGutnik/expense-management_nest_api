@@ -2,6 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -11,6 +13,7 @@ import { Category } from '@/modules/category/entities/category.entity'
 import { Transaction } from '@/modules/transaction/entities/transaction.entity'
 import { Exclude } from 'class-transformer'
 import { Token } from '@/modules/token/entities/token.entity'
+import { Role } from '@/modules/role/entities/role.entity'
 
 @Entity()
 export class User {
@@ -30,6 +33,10 @@ export class User {
   @Exclude()
   @Column({ nullable: true })
   verificationLink: string
+
+  @ManyToOne(() => Role, { eager: true })
+  @JoinColumn({ name: 'role_id' })
+  role: Role
 
   @OneToMany(() => Category, category => category.user, { onDelete: 'CASCADE' })
   categories: Category[]
