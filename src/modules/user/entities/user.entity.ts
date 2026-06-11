@@ -30,7 +30,6 @@ export class User {
   @Column({ default: false })
   verify: boolean
 
-  @Exclude()
   @Column({ nullable: true })
   verificationLink: string
 
@@ -49,7 +48,6 @@ export class User {
   @OneToOne(() => Token, token => token.user, { onDelete: 'CASCADE' })
   refreshToken: Token
 
-  @Exclude()
   @Column({ nullable: true })
   pendingEmail: string
 

@@ -11,13 +11,11 @@ import {
   Query,
   Req,
   ParseIntPipe,
-  ForbiddenException,
 } from '@nestjs/common'
 import { Response, Request } from 'express'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { JwtAccessGuard } from '@/modules/auth/guards/jwt-access.guard'
-import { UpdateUserDto } from './dto/update-user.dto'
 import { ConfigService } from '@nestjs/config'
 import { Permissions } from '@/core/authorization/decorators/permissions.decorator'
 import { PermissionsGuard } from '@/core/authorization/guards/permissions.guard'
@@ -78,12 +76,11 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: ChangeUserRoleDto,
   ) {
-    return this.userService.changeUserRole(req.user.id, id, dto.roleId)
+    return this.userService.changeRole(req.user.id, id, dto.roleId)
   }
 
   @Patch('email')
-  @UseGuards(JwtAccessGuard, PermissionsGuard)
-  @Permissions('user:updateEmail')
+  @UseGuards(JwtAccessGuard)
   changeEmail(
     @Req() req: Request & { user: IJwtPayload },
     @Body() dto: ChangeEmailDto,
@@ -92,8 +89,7 @@ export class UserController {
   }
 
   @Patch('password')
-  @UseGuards(JwtAccessGuard, PermissionsGuard)
-  @Permissions('user:updatePassword')
+  @UseGuards(JwtAccessGuard)
   changePassword(
     @Req() req: Request & { user: IJwtPayload },
     @Body() dto: ChangePasswordDto,
@@ -109,9 +105,13 @@ export class UserController {
   // }
 
   @Get('/verify/:link')
-  async verifyMail(@Param('link') link: string, @Res() res: Response) {
-    await this.userService.verifyMail(link)
-    res.redirect(this.configService.get<string>('CLIENT_URL'))
+  async verifyMail(@Param('link') link: string) {
+    return await this.userService.verifyMail(link)
+  }
+
+  @Get('/verify-admin/:link')
+  async verifyAdmin(@Param('link') link: string) {
+    return await this.userService.verifyAdmin(link)
   }
 
   @Delete(':id')

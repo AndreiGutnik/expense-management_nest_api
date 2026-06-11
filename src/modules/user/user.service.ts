@@ -16,6 +16,7 @@ import { MailService } from '../mail/mail.service'
 import { ConfigService } from '@nestjs/config'
 import { Role } from '../role/entities/role.entity'
 import { ChangePasswordDto } from './dto/change-password.dto'
+import { instanceToPlain } from 'class-transformer'
 
 @Injectable()
 export class UserService {
@@ -43,7 +44,7 @@ export class UserService {
     if (!defaultRole) {
       throw new InternalServerErrorException('Default user role not configured')
     }
-    const user = await this.userRepository.save({
+    const newUser = await this.userRepository.save({
       email: createUserDto.email,
       password: await argon2.hash(createUserDto.password),
       verificationLink,
@@ -51,7 +52,7 @@ export class UserService {
     })
 
     await this.mailService.sendVerifyMail(
-      user.email,
+      createUserDto.email,
       `${this.configService.get<string>('API_URL')}/api/user/verify/${verificationLink}`,
     )
 
@@ -66,6 +67,12 @@ export class UserService {
     //   accessToken,
     //   refreshToken,
     // }
+    const user = await this.userRepository.findOne({
+      where: { id: newUser.id },
+      relations: {
+        role: true,
+      },
+    })
     return user
   }
 
@@ -73,11 +80,7 @@ export class UserService {
     return await this.userRepository.find()
   }
 
-  async changeUserRole(
-    currentUserId: number,
-    newUserId: number,
-    roleId: number,
-  ) {
+  async changeRole(currentUserId: number, newUserId: number, roleId: number) {
     if (currentUserId === newUserId) {
       throw new BadRequestException('You cannot change your own role')
     }
@@ -116,10 +119,6 @@ export class UserService {
       if (roleId <= 2) {
         throw new BadRequestException('Admin cannot assign this role')
       }
-    }
-
-    if (currentUserId === newUserId && currentRoleId === 2 && roleId <= 2) {
-      throw new BadRequestException('Admin cannot assign newrole to self')
     }
 
     newUser.role = role
@@ -203,17 +202,47 @@ export class UserService {
     if (!user) {
       throw new ConflictException('Verification link is not correct')
     }
-    const updateData: Partial<User> = {
-      verify: true,
-      verificationLink: '',
-    }
 
     if (user.pendingEmail) {
-      updateData.email = user.pendingEmail
-      updateData.pendingEmail = null
+      await this.userRepository.update(user.id, {
+        email: user.pendingEmail,
+        pendingEmail: null,
+        verificationLink: '',
+        verify: true,
+      })
+      return { message: 'Email change verified successfully' }
     }
 
-    await this.userRepository.update(user.id, updateData)
+    const adminVerificationLink = generateKey()
+    await this.userRepository.update(user.id, {
+      verificationLink: adminVerificationLink,
+      verify: false,
+    })
+
+    await this.mailService.sendAdminApprovalMail(
+      this.configService.getOrThrow<string>('ADMIN_EMAIL'),
+      user.email,
+      `${this.configService.get<string>('API_URL')}/api/user/verify-admin/${adminVerificationLink}`,
+    )
+    return { message: 'Registration successful, pending admin approval' }
+  }
+
+  async verifyAdmin(adminVerificationLink: string) {
+    const user = await this.userRepository.findOne({
+      where: {
+        verificationLink: adminVerificationLink,
+      },
+    })
+    if (!user) {
+      throw new ConflictException('Verification link is not correct')
+    }
+    await this.userRepository.update(user.id, {
+      verificationLink: '',
+      verify: true,
+    })
+    await this.mailService.sendRegistrationApprovedMail(user.email)
+
+    return { message: 'Admin approval successful, you can now log in' }
   }
 
   async remove(id: number) {
