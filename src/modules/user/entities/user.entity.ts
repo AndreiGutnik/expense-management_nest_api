@@ -49,6 +49,10 @@ export class User {
   @OneToOne(() => Token, token => token.user, { onDelete: 'CASCADE' })
   refreshToken: Token
 
+  @Exclude()
+  @Column({ nullable: true })
+  pendingEmail: string
+
   @CreateDateColumn()
   createdAt: Date
 

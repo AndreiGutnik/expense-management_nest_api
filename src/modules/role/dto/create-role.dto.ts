@@ -1,6 +1,5 @@
 import { Type } from 'class-transformer'
 import {
-  ArrayNotEmpty,
   ArrayUnique,
   IsArray,
   IsInt,
@@ -19,9 +18,9 @@ export class CreateRoleDto {
   description?: string
 
   @IsArray()
-  @ArrayNotEmpty()
+  // @ArrayNotEmpty()
   @ArrayUnique()
   @Type(() => Number)
   @IsInt({ each: true })
-  permissions: number[]
+  permissions: number[] = []
 }
