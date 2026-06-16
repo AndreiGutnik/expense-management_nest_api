@@ -9,6 +9,7 @@ import { TokenModule } from './modules/token/token.module';
 import { MailModule } from './modules/mail/mail.module';
 import { RoleModule } from './modules/role/role.module';
 import { PermissionModule } from './modules/permission/permission.module';
+import { LicenseModule } from './modules/license/license.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { PermissionModule } from './modules/permission/permission.module';
     MailModule,
     RoleModule,
     PermissionModule,
+    LicenseModule,
   ],
 })
 export class AppModule {}
