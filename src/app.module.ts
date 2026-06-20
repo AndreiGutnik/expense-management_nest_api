@@ -5,11 +5,10 @@ import { AuthModule } from '@/modules/auth/auth.module'
 import { TransactionModule } from '@/modules/transaction/transaction.module'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { TokenModule } from './modules/token/token.module';
-import { MailModule } from './modules/mail/mail.module';
-import { RoleModule } from './modules/role/role.module';
-import { PermissionModule } from './modules/permission/permission.module';
-import { LicenseModule } from './modules/license/license.module';
+import { TokenModule } from './modules/token/token.module'
+import { MailModule } from './modules/mail/mail.module'
+import { RoleModule } from './modules/role/role.module'
+import { PermissionModule } from './modules/permission/permission.module'
 
 @Module({
   imports: [
@@ -38,7 +37,6 @@ import { LicenseModule } from './modules/license/license.module';
     MailModule,
     RoleModule,
     PermissionModule,
-    LicenseModule,
   ],
 })
 export class AppModule {}

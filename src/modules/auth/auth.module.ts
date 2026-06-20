@@ -7,9 +7,10 @@ import { LocalStrategy } from '@/modules/auth/strategies/local.strategy'
 import { JwtAccessStrategy } from './strategies/jwtAccess.strategy'
 import { JwtRefreshStrategy } from './strategies/jwtRefresh.strategy'
 import { TokenModule } from '../token/token.module'
+import { LicenseModule } from '../license/license.module'
 
 @Module({
-  imports: [UserModule, PassportModule, TokenModule],
+  imports: [UserModule, PassportModule, TokenModule, LicenseModule],
   controllers: [AuthController],
   providers: [
     AuthService,

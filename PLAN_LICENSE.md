@@ -174,7 +174,7 @@ async canActivate(context: ExecutionContext): Promise<boolean> {
 ```typescript
 @Module({
   providers: [LicenseService, LicenseGuard],
-  exports: [LicenseGuard],
+  exports: [LicenseService, LicenseGuard],
 })
 export class LicenseModule {}
 ```
@@ -226,3 +226,41 @@ export class LicenseModule {}
 | Vendor DB недоступна | `401 {"message":"Unauthorized"}` | `ERROR License check failed: <детали>` |
 
 Все случаи неразличимы для пользователя и внешнего наблюдателя.
+
+---
+
+## Статус реализации
+
+Дата проверки: 2026-06-20.
+
+Статус: **готово**.
+
+### Что реализовано
+
+| Пункт | Статус | Файл |
+|---|---|---|
+| SQL-скрипт vendor DB создан | Готово | `database/license-schema.sql` |
+| Переменные окружения добавлены в пример env | Готово | `.env.example` |
+| `LICENSE_NAME` проверяется при старте приложения | Готово | `src/modules/license/license.service.ts` |
+| Подключение к vendor DB сделано через `pg.Pool`, без TypeORM | Готово | `src/modules/license/license.service.ts` |
+| Таймауты `connectionTimeoutMillis` и `query_timeout` заданы по 3000 ms | Готово | `src/modules/license/license.service.ts` |
+| Проверка лицензии ищет запись по `LICENSE_NAME` | Готово | `src/modules/license/license.service.ts` |
+| Не найденная, отключённая, истёкшая лицензия и ошибки vendor DB возвращают `UnauthorizedException()` без кастомного текста | Готово | `src/modules/license/license.service.ts` |
+| Реальная причина отказа пишется только в серверный лог | Готово | `src/modules/license/license.service.ts` |
+| `LicenseGuard` содержит только вызов `checkLicense()` | Готово | `src/modules/license/guards/license.guard.ts` |
+| `LicenseModule` экспортирует `LicenseService` и `LicenseGuard`, не импортирует TypeORM | Готово | `src/modules/license/license.module.ts` |
+| `/api/auth/login` защищён guards в порядке `LicenseGuard, LocalAuthGuard` | Готово | `src/modules/auth/auth.controller.ts` |
+| `/api/auth/refresh` не проверяет лицензию | Готово | `src/modules/auth/auth.controller.ts` |
+| `LicenseModule` подключён в `AuthModule` | Готово | `src/modules/auth/auth.module.ts` |
+| `app.module.ts` не подключает `LicenseModule` и не содержит отдельной license-конфигурации TypeORM | Готово | `src/app.module.ts` |
+| Entity и DTO для license отсутствуют | Готово | `src/modules/license/` |
+
+### Проверки
+
+- `npm run build` выполнен успешно.
+- Авторизация через Postman прошла успешно: при валидной лицензии и валидных данных пользователь получает `accessToken`, а `refreshToken` устанавливается в httpOnly cookie.
+- Проверка лицензии остаётся скрытой для пользователя: успешный login означает, что лицензия найдена, активна, не истекла и vendor DB доступна.
+
+### Текущий итог
+
+Реализация соответствует выбранному варианту из плана: лицензия проверяется только на login, подключение к vendor DB выполняется напрямую через `pg`, ошибки лицензирования закрываются как обычный `401 Unauthorized`, а refresh-токены продолжают работать без повторной проверки лицензии до своего истечения.

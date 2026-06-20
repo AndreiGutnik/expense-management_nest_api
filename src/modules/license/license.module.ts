@@ -4,6 +4,6 @@ import { LicenseGuard } from './guards/license.guard'
 
 @Module({
   providers: [LicenseService, LicenseGuard],
-  exports: [LicenseGuard],
+  exports: [LicenseService, LicenseGuard],
 })
 export class LicenseModule {}
