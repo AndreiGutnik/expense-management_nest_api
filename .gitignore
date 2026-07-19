@@ -11,6 +11,8 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+storage/license-cache.json
+storage/license-cache.json.tmp
 
 # OS
 .DS_Store

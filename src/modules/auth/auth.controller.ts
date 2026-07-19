@@ -12,6 +12,7 @@ import { Response, Request } from 'express'
 import { TokenService } from '../token/token.service'
 import { IJwtPayload } from '../user/types/types'
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard'
+import { LicenseGuard } from '../license/guards/license.guard'
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +22,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(LicenseGuard, LocalAuthGuard)
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const userPayload = req.user as IJwtPayload
     const { user, accessToken, refreshToken } =
@@ -41,7 +42,7 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(JwtRefreshGuard)
+  @UseGuards(LicenseGuard, JwtRefreshGuard)
   async refreshTokens(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
